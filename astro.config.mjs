@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
   site: 'https://zeecares.github.io',
@@ -9,5 +10,9 @@ export default defineConfig({
       wrap: true
     }
   },
-  integrations: []
+  integrations: [
+    tailwind({
+      config: { path: './tailwind.config.js' }
+    })
+  ]
 });

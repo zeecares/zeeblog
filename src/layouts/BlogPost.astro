@@ -3,8 +3,10 @@ import Layout from './Layout.astro';
 
 interface Frontmatter {
     title: string;
-    date: string;
+    date?: string;
     tags?: string[];
+    description?: string;
+    author?: string;
 }
 
 interface Props {
@@ -12,24 +14,27 @@ interface Props {
 }
 
 const { frontmatter } = Astro.props;
+const postDate = frontmatter.pubDate || frontmatter.date;
 ---
 
 <Layout title={frontmatter.title}>
   <article class="max-w-4xl mx-auto px-4 py-8">
     <h1 class="text-4xl font-bold mb-4">{frontmatter.title}</h1>
     <div class="text-gray-600 mb-8">
-      <time datetime={frontmatter.date}>
-        {new Date(frontmatter.date).toLocaleDateString()}
-      </time>
+      {postDate && (
+        <time datetime={postDate}>
+          {new Date(postDate).toLocaleDateString()}
+        </time>
+      )}
+      {frontmatter.author && (
+        <span class="ml-2">by {frontmatter.author}</span>
+      )}
       {frontmatter.tags && (
         <div class="flex gap-2 mt-2">
           {frontmatter.tags.map((tag) => (
-            <a
-              href={`/search?q=${encodeURIComponent(tag)}`}
-              class="text-sm bg-gray-200 px-2 py-1 rounded-full hover:bg-gray-300"
-            >
+            <span class="text-sm bg-gray-200 px-2 py-1 rounded-full hover:bg-gray-300">
               {tag}
-            </a>
+            </span>
           ))}
         </div>
       )}

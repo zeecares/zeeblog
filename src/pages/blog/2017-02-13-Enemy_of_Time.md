@@ -2,7 +2,7 @@
 layout: "../../layouts/BlogPost.astro"
 title: "时间的敌人"
 description: "关于时间、消费主义和现代社会的思考，以及《离线》杂志停刊带来的感悟"
-pubDate: 2017-02-13
+date: 2017-02-13
 layout: post
 author: "Ziyi Wang"
 tags: ["消费主义", "互联网", "社会评论", "媒体", "人性", "知识", "商业", "道德", "离线杂志", "中文"]
