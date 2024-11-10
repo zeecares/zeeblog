@@ -1,8 +1,6 @@
-import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
+import { defineConfig } from 'astro';
 
 export default defineConfig({
-  integrations: [tailwind()],
   site: 'https://zeecares.github.io',
   base: '/zeeblog',
 });
