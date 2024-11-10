@@ -3,5 +3,11 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://zeecares.github.io',
   base: '/zeeblog',
-  outDir: './dist',
+  markdown: {
+    shikiConfig: {
+      theme: 'github-light',
+      wrap: true
+    }
+  },
+  integrations: []
 });

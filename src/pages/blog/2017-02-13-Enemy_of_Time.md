@@ -1,4 +1,5 @@
 ---
+layout: "../../layouts/BlogPost.astro"
 title: "时间的敌人"
 description: "关于时间、消费主义和现代社会的思考，以及《离线》杂志停刊带来的感悟"
 pubDate: 2017-02-13
