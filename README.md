@@ -1,5 +1,7 @@
 # Astro Starter Kit: Basics
 
+🌐 **Live Site:** [https://zeecares.github.io/zeeblog](https://zeecares.github.io/zeeblog)
+
 ```sh
 npm create astro@latest -- --template basics
 ```
