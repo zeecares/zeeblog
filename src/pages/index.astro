@@ -12,11 +12,11 @@ const tagCounts = posts.reduce((acc: { [key: string]: number }, post) => {
     acc[tag] = (acc[tag] || 0) + 1;
   });
   return acc;
-}, {});
+}, {} as { [key: string]: number });
 
-const tagCloudData = Object.entries(tagCounts).map(([tag, count]) => ({
+const tagCloudData = Object.entries(tagCounts).map(([tag, count]): { tag: string; count: number } => ({
   tag,
-  count
+  count: count as number
 }));
 ---
 
