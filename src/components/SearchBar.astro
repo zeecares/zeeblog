@@ -1,0 +1,113 @@
+---
+---
+<div class="w-full max-w-xl mx-auto relative">
+  <div class="relative">
+    <input
+      type="text"
+      id="search-input"
+      placeholder="Search posts..."
+      class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    <div id="search-results" class="absolute w-full bg-white mt-1 rounded-lg shadow-lg hidden"></div>
+  </div>
+</div>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  class SearchHandler {
+    private searchInput: HTMLInputElement | null;
+    private resultsContainer: HTMLDivElement | null;
+    private fuse: Fuse<any> | null = null;
+
+    constructor() {
+      this.searchInput = document.getElementById('search-input') as HTMLInputElement;
+      this.resultsContainer = document.getElementById('search-results') as HTMLDivElement;
+      this.init();
+    }
+
+    private async init() {
+      try {
+        const response = await fetch('/api/posts.json');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const posts = await response.json();
+        this.fuse = new Fuse(posts, {
+          keys: ['title', 'description', 'tags'],
+          threshold: 0.3,
+          includeScore: true
+        });
+
+        this.setupEventListeners();
+      } catch (error) {
+        console.error('Search initialization failed:', error);
+        this.showError('Failed to initialize search. Please try again later.');
+      }
+    }
+
+    private setupEventListeners() {
+      if (!this.searchInput || !this.resultsContainer) return;
+
+      this.searchInput.addEventListener('input', () => this.handleSearch());
+      document.addEventListener('click', (e) => this.handleClickOutside(e));
+      this.searchInput.addEventListener('focus', () => this.handleSearch());
+    }
+
+    private handleSearch() {
+      if (!this.searchInput || !this.resultsContainer || !this.fuse) return;
+
+      const query = this.searchInput.value.trim();
+      
+      if (query.length === 0) {
+        this.hideResults();
+        return;
+      }
+
+      const results = this.fuse.search(query).slice(0, 5);
+      this.displayResults(results);
+    }
+
+    private displayResults(results: Fuse.FuseResult<any>[]) {
+      if (!this.resultsContainer) return;
+
+      if (results.length === 0) {
+        this.resultsContainer.innerHTML = '<p class="p-4 text-gray-500">No results found</p>';
+      } else {
+        this.resultsContainer.innerHTML = results
+          .map(({ item }) => `
+            <a href="/blog/${item.slug}" 
+               class="block p-4 hover:bg-gray-100 border-b last:border-b-0">
+              <h3 class="text-lg font-semibold">${item.title}</h3>
+              <p class="text-sm text-gray-600">${item.description}</p>
+            </a>
+          `)
+          .join('');
+      }
+
+      this.resultsContainer.classList.remove('hidden');
+    }
+
+    private hideResults() {
+      this.resultsContainer?.classList.add('hidden');
+    }
+
+    private showError(message: string) {
+      if (this.resultsContainer) {
+        this.resultsContainer.innerHTML = `<p class="p-4 text-red-500">${message}</p>`;
+        this.resultsContainer.classList.remove('hidden');
+      }
+    }
+
+    private handleClickOutside(event: MouseEvent) {
+      if (!this.searchInput || !this.resultsContainer) return;
+      
+      const target = event.target as Node;
+      if (!this.searchInput.contains(target) && !this.resultsContainer.contains(target)) {
+        this.hideResults();
+      }
+    }
+  }
+
+  // Initialize search when the DOM is ready
+  document.addEventListener('DOMContentLoaded', () => new SearchHandler());
+</script>

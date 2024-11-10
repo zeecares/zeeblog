@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SearchBar from '../components/SearchBar.astro';
+
+const query = Astro.url.searchParams.get('q');
+---
+
+<Layout title={`Search: ${query || ''}`}>
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold text-center mb-8">Search Results</h1>
+    
+    <div class="mb-8">
+      <SearchBar />
+    </div>
+
+    <div id="search-results-page" class="grid gap-8">
+      <!-- Results will be populated by client-side JavaScript -->
+    </div>
+  </main>
+</Layout>
+
+<script define:vars={{ initialQuery: query }}>
+  import Fuse from 'fuse.js';
+
+  async function initializeSearch() {
+    try {
+      const response = await fetch('/api/posts.json');
+      if (!response.ok) throw new Error('Failed to fetch posts');
+      
+      const posts = await response.json();
+      const fuse = new Fuse(posts, {
+        keys: ['title', 'description', 'tags'],
+        threshold: 0.3
+      });
+
+      const results = initialQuery ? fuse.search(initialQuery) : [];
+      displayResults(results);
+    } catch (error) {
+      console.error('Search page initialization failed:', error);
+      showError('Failed to load search results. Please try again later.');
+    }
+  }
+
+  function displayResults(results) {
+    const container = document.getElementById('search-results-page');
+    if (!container) return;
+
+    if (results.length === 0) {
+      container.innerHTML = '<p class="text-center text-gray-500">No results found</p>';
+      return;
+    }
+
+    container.innerHTML = results
+      .map(({ item }) => `
+        <article class="border rounded-lg p-6 hover:shadow-lg transition-shadow">
+          <h2 class="text-2xl font-bold mb-2">
+            <a href="/blog/${item.slug}" class="hover:text-blue-600">
+              ${item.title}
+            </a>
+          </h2>
+          <time datetime="${item.date}" class="text-gray-600 mb-4 block">
+            ${new Date(item.date).toLocaleDateString()}
+          </time>
+          <p class="text-gray-700 mb-4">${item.description}</p>
+          <div class="flex gap-2">
+            ${(item.tags || [])
+              .map(tag => `
+                <a
+                  href="/search?q=${encodeURIComponent(tag)}"
+                  class="text-sm bg-gray-200 px-2 py-1 rounded-full hover:bg-gray-300"
+                >
+                  ${tag}
+                </a>
+              `)
+              .join('')}
+          </div>
+        </article>
+      `)
+      .join('');
+  }
+
+  function showError(message) {
+    const container = document.getElementById('search-results-page');
+    if (container) {
+      container.innerHTML = `<p class="text-center text-red-500">${message}</p>`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initializeSearch);
+</script>

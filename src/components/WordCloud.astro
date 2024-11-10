@@ -1,0 +1,25 @@
+---
+interface Props {
+  tags: { tag: string; count: number }[];
+}
+
+const { tags } = Astro.props;
+
+function getFontSize(count: number): string {
+  const baseSize = 14;
+  const scale = Math.log(count + 1) * 4;
+  return `${baseSize + scale}px`;
+}
+---
+
+<div class="flex flex-wrap gap-3 justify-center p-4">
+  {tags.map(({ tag, count }) => (
+    <a
+      href={`/search?q=${encodeURIComponent(tag)}`}
+      class="hover:text-blue-500 transition-colors"
+      style={`font-size: ${getFontSize(count)}`}
+    >
+      {tag}
+    </a>
+  ))}
+</div>
