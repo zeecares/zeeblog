@@ -4,8 +4,8 @@ export const GET: APIRoute = async () => {
 try {
 const postFiles = import.meta.glob('../blog/*.{md,mdx}');
 const posts = await Promise.all(
-Object.keys(postFiles).map(async (path) => {
-        const post = await postFiles[path]();
+Object.entries(postFiles).map(async ([path, resolver]) => {
+        const post = await resolver();
         return {
           title: post.frontmatter.title,
           description: post.frontmatter.description,
